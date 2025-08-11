@@ -1,0 +1,37 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h3 class="text-center mb-4">Select Payment Method</h3>
+
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <form method="POST" action="{% url 'process_payment' booking.id %}">
+        {% csrf_token %}
+
+        <!-- UPI Methods -->
+        <div class="form-check">
+          <input class="form-check-input-gery w-5" type="radio" name="payment_method" value="GPay" id="gpay" required>
+          <label class="form-check-label" for="gpay">Google Pay</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input-gery w-5" type="radio" name="payment_method" value="PhonePe" id="phonepe">
+          <label class="form-check-label" for="phonepe">PhonePe</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input-gery w-5" type="radio" name="payment_method" value="Paytm" id="paytm" >
+          <label class="form-check-label" for="paytm">Paytm</label>
+        </div>
+    </div>
+        <!-- Booking Summary -->
+        <hr>
+        <p><strong>Movie:</strong> {{ booking.movie.name }}</p>
+        <p><strong>Theater:</strong> {{ booking.theater.name }}</p>
+        <p><strong>Seat:</strong> {{ booking.seat.seat_number }}</p>
+        <p><strong>Amount:</strong> ₹{{ booking.price }}</p>
+
+        <button type="submit" class="btn btn-success w-100 mt-3">Pay Now</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

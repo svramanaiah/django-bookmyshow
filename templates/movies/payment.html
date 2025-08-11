@@ -1,0 +1,69 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Complete Payment</h3>
+    <p><strong>Movie:</strong> {{ booking.movie.name }}</p>
+    <p><strong>Theater:</strong> {{ booking.theater.name }}</p>
+    <p><strong>Amount:</strong> ₹{{ booking.price }}</p>
+
+    <!-- A button to open checkout (we will open automatically) -->
+    <button id="rzp-button" class="btn btn-primary">Pay Now</button>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const options = {
+      "key": "{{ razorpay_key_id }}", // Enter the Key ID
+      "amount": "{{ payment.amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 100 = 1 INR
+      "currency": "INR",
+      "name": "BookMySeat",
+      "description": "Ticket Purchase",
+      "order_id": "{{ payment.id }}", //This is a sample Order ID. Pass the `id` obtained in createOrder.
+      "handler": function (response){
+          // POST the response to server to verify
+          const data = new URLSearchParams();
+          data.append('booking_id', '{{ booking.id }}');
+          data.append('razorpay_payment_id', response.razorpay_payment_id);
+          data.append('razorpay_order_id', response.razorpay_order_id);
+          data.append('razorpay_signature', response.razorpay_signature);
+
+          fetch("{% url 'payment_success' %}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: data
+          })
+          .then(resp => resp.text())
+          .then(txt => {
+            // navigate to a success page (server renders payment_success.html)
+            window.location.href = "{% url 'movie_list' %}";
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Payment verification failed. Please contact support.');
+          });
+      },
+      "prefill": {
+          "name": "{{ booking.user.username }}",
+          "email": "{{ booking.user.email }}"
+      },
+      "theme": {
+          "color": "#F37254"
+      }
+    };
+
+    const rzp1 = new Razorpay(options);
+    // Optional: attach to a button
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    };
+
+    // Auto open checkout if you want:
+    // rzp1.open();
+  });
+</script>
+{% endblock %}

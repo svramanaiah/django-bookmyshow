@@ -1,0 +1,143 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">🎟 Admin Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-primary">
+                <div class="card-body">
+                    <h5>Total Revenue</h5>
+                    <p class="fs-4 text-success">₹{{ total_revenue }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-warning">
+                <div class="card-body">
+                    <h5>Most Popular Movie</h5>
+                    {% if popular_movie %}
+                        <p class="fs-5">{{ popular_movie.name }}</p>
+                        <p class="text-muted">{{ popular_movie.total_bookings }} Bookings</p>
+                    {% else %}
+                        <p class="text-muted">No data</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-info">
+                <div class="card-body">
+                    <h5>Busiest Theater</h5>
+                    {% if busy_theater %}
+                        <p class="fs-5">{{ busy_theater.name }}</p>
+                        <p class="text-muted">{{ busy_theater.total_bookings }} Bookings</p>
+                    {% else %}
+                        <p class="text-muted">No data</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="card mb-4 p-4">
+        <h4>Top 5 Popular Movies</h4>
+        <ul>
+            {% for movie in popular_movies %}
+                <li>{{ movie.name }} - {{ movie.total_bookings }} bookings</li>
+            {% empty %}
+                <li>No data available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card p-4">
+        <h4>Top 5 Busiest Theaters</h4>
+        <ul>
+            {% for theater in busy_theaters %}
+                <li>{{ theater.name }} - {{ theater.total_bookings }} bookings</li>
+            {% empty %}
+                <li>No data available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr class="my-5">
+
+    <h4>Recent Bookings</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Movie</th>
+                <th>Theater</th>
+                <th>Seat</th>
+                <th>Amount</th>
+                <th>Booked On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in recent_bookings %}
+            <tr>
+                <td>{{ booking.user.username }}</td>
+                <td>{{ booking.movie.name }}</td>
+                <td>{{ booking.theater.name }}</td>
+                <td>{{ booking.seat }}</td>
+                <td>₹{{ booking.price }}</td>
+                <td>{{ booking.booked_at }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No bookings yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  h2, h4 {
+    color: #333;
+  }
+
+  .card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+</style>

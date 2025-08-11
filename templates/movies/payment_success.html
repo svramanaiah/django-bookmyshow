@@ -1,0 +1,42 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2>🎉 Payment Successful!</h2>
+    <p>Your ticket has been booked successfully.</p>
+    <a href="{% url 'movie_list' %}" class="btn btn-success">Back to Movies</a>
+</div>
+
+<script>
+var options = {
+  "key": "{{ razorpay_key_id }}",
+  "amount": "{{ payment_amount }}",
+  "currency": "INR",
+  "order_id": "{{ payment_order_id }}",
+  "handler": function (response){
+      // send payment details to server to verify
+      fetch("{% url 'payment_success' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          'booking_id': '{{ booking.id }}',
+          'razorpay_payment_id': response.razorpay_payment_id,
+          'razorpay_order_id': response.razorpay_order_id,
+          'razorpay_signature': response.razorpay_signature
+        })
+      }).then(resp => resp.text()).then(txt=>{
+          // redirect to success page or show message
+          window.location.href = "{% url 'movie_list' %}";
+      });
+  },
+  "prefill": { "name": "{{ booking.user.username }}", "email": "{{ booking.user.email }}" },
+  "theme": { "color": "#F37254" }
+};
+var rzp1 = new Razorpay(options);
+document.addEventListener("DOMContentLoaded", function(){
+  rzp1.open();
+});
+</script>
+
+{% endblock %}
